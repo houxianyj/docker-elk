@@ -43,15 +43,11 @@ docker-compose up
 
 ---
 
-## Philosophy
+## 理念
 
-We aim at providing the simplest possible entry into the Elastic stack for anybody who feels like experimenting with
-this powerful combo of technologies. This project's default configuration is purposely minimal and unopinionated. It
-does not rely on any external dependency, and uses as little custom automation as necessary to get things up and
-running.
+我们旨在为任何有兴趣尝试这一强大技术组合的人提供进入 Elastic Stack 的最简单途径。这个项目的默认配置是特意保持简约和中立的。它不依赖于任何外部依赖项，并且只使用了尽可能少的自定义自动化来启动和运行。
 
-Instead, we believe in good documentation so that you can use this repository as a template, tweak it, and make it _your
-own_. [sherifabdlnaby/elastdocker][elastdocker] is one example among others of project that builds upon this idea.
+相反，我们相信良好的文档，这样您就可以将此存储库用作模板，进行调整，并使其符合您自己的需求。[sherifabdlnaby/elastdocker][elastdocker] 是基于这一理念的项目之一。
 
 ---
 
@@ -98,14 +94,14 @@ own_. [sherifabdlnaby/elastdocker][elastdocker] is one example among others of p
 > Especially on Linux, make sure your user has the [required permissions][linux-postinstall] to interact with the Docker
 > daemon.
 
-By default, the stack exposes the following ports:
+默认情况下，堆栈暴露以下端口：:
 
-* 5044: Logstash Beats input
-* 50000: Logstash TCP input
-* 9600: Logstash monitoring API
-* 9200: Elasticsearch HTTP
-* 9300: Elasticsearch TCP transport
-* 5601: Kibana
+* 5044：Logstash Beats 输入
+* 50000：Logstash TCP 输入
+* 9600：Logstash 监控 API
+* 9200：Elasticsearch HTTP
+* 9300：Elasticsearch TCP 传输
+* 5601：Kibana
 
 > [!WARNING]
 > Elasticsearch's [bootstrap checks][bootstrap-checks] were purposely disabled to facilitate the setup of the Elastic
@@ -127,32 +123,30 @@ instructions from the [documentation][mac-filesharing] to add more locations.
 
 ## Usage
 
-> [!WARNING]
-> You must rebuild the stack images with `docker-compose build` whenever you switch branch or update the
-> [version](#version-selection) of an already existing stack.
+> [!警告]
+> 
+> 每当您切换分支或更新现有堆栈的[版本](#version-selection)时，必须使用 docker-compose build 重新构建堆栈镜像。
 
-### Bringing up the stack
+### 启动堆栈
 
-Clone this repository onto the Docker host that will run the stack with the command below:
-
+将此存储库克隆到将运行堆栈的 Docker 主机上，使用以下命令：
 ```sh
 git clone https://github.com/deviantony/docker-elk.git
 ```
 
-Then, initialize the Elasticsearch users and groups required by docker-elk by executing the command:
-
+然后，通过执行以下命令初始化 docker-elk 所需的 Elasticsearch 用户和组：
 ```sh
 docker-compose up setup
 ```
 
-If everything went well and the setup completed without error, start the other stack components:
-
+如果一切顺利且设置完成没有错误，启动其他堆栈组件：
 ```sh
 docker-compose up
 ```
 
 > [!NOTE]
-> You can also run all services in the background (detached mode) by appending the `-d` flag to the above command.
+> 
+> 您还可以通过在上述命令后附加 -d 标志来在后台（分离模式）运行所有服务。
 
 Give Kibana about a minute to initialize, then access the Kibana web UI by opening <http://localhost:5601> in a web
 browser and use the following (default) credentials to log in:
@@ -167,9 +161,9 @@ browser and use the following (default) credentials to log in:
 > Elasticsearch. This task is only performed during the _initial_ startup of the stack. To change users' passwords
 > _after_ they have been initialized, please refer to the instructions in the next section.
 
-### Initial setup
+### 初始设置
 
-#### Setting up user authentication
+#### 设置用户身份验证
 
 > [!NOTE]
 > Refer to [Security settings in Elasticsearch][es-security] to disable authentication.
