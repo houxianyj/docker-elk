@@ -5,6 +5,8 @@
 server.name: kibana
 server.host: 0.0.0.0
 elasticsearch.hosts: [ https://elasticsearch:9200 ]
+#中文界面 zh-CN    英文猜测是 en
+i18n.locale: "zh-CN"
 
 monitoring.ui.container.elasticsearch.enabled: true
 monitoring.ui.container.logstash.enabled: true
