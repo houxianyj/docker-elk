@@ -343,6 +343,10 @@ Changing the license type by switching the value of Elasticsearch's `xpack.licen
 After a trial has been started, the loss of features from `trial` to `basic` _must_ be acknowledged using one of the two
 methods described in the first paragraph.
 
+您可以在试用期到期前取消正在进行的试用，从而恢复到基本许可证。这可以通过 Kibana 的许可证管理面板来实现，或者使用 Elasticsearch 的 start_basic 许可 API。请注意，如果在试用期到期之前没有将许可证切换为基本许可证或升级，这是恢复对 Kibana 访问的唯一方法。
+
+通过将 Elasticsearch 的 xpack.license.self_generated.type 设置的值从 trial 切换为 basic 来更改许可证类型（参见许可证设置）仅在初始设置之前有效。在试用期开始后，必须使用第一段中描述的两种方法之一来确认从试用到基本许可证的功能丧失。
+
 ### How to scale out the Elasticsearch cluster
 
 Follow the instructions from the Wiki: [Scaling out Elasticsearch](https://github.com/deviantony/docker-elk/wiki/Elasticsearch-cluster)
@@ -396,6 +400,10 @@ are not part of the standard Elastic stack, but can be used to enrich it with ex
 
 The documentation for these extensions is provided inside each individual subdirectory, on a per-extension basis. Some
 of them require manual changes to the default ELK configuration.
+
+在 extensions 目录中提供了一些扩展。这些扩展并不是标准 Elastic 栈的一部分，但可以用来丰富其功能，提供额外的集成。
+
+这些扩展的文档位于每个子目录中，并且是按扩展提供的。其中一些扩展需要手动更改默认的 ELK 配置。
 
 ## JVM tuning
 

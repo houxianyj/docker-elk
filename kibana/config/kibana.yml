@@ -9,6 +9,9 @@ elasticsearch.hosts: [ http://elasticsearch:9200 ]
 monitoring.ui.container.elasticsearch.enabled: true
 monitoring.ui.container.logstash.enabled: true
 
+#显示中文
+i18n.locale: "zh-CN"
+
 ## X-Pack security credentials
 #
 elasticsearch.username: kibana_system
