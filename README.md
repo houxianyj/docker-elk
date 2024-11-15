@@ -1,6 +1,6 @@
 # Elastic stack (ELK) on Docker
 
-[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.14.3-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
+[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-8.15.3-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
 [![Build Status](https://github.com/deviantony/docker-elk/workflows/CI/badge.svg?branch=main)](https://github.com/deviantony/docker-elk/actions?query=workflow%3ACI+branch%3Amain)
 [![Join the chat](https://badges.gitter.im/Join%20Chat.svg)](https://app.gitter.im/#/room/#deviantony_docker-elk:gitter.im)
 
@@ -19,7 +19,6 @@ Other available stack variants:
 
 * [`tls`](https://github.com/deviantony/docker-elk/tree/tls): TLS encryption enabled in Elasticsearch, Kibana (opt in),
   and Fleet
-* [`searchguard`](https://github.com/deviantony/docker-elk/tree/searchguard): Search Guard support
 
 > [!IMPORTANT]
 > [Platinum][subscriptions] features are enabled by default for a [trial][license-mngmt] duration of **30 days**. After
@@ -32,22 +31,29 @@ Other available stack variants:
 ## tl;dr
 
 ```sh
-docker-compose up setup
+docker compose up setup
 ```
 
 ```sh
-docker-compose up
+docker compose up
 ```
 
-![Animated demo](https://user-images.githubusercontent.com/3299086/155972072-0c89d6db-707a-47a1-818b-5f976565f95a.gif)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/6f67cbc0-ddee-44bf-8f4d-7fd2d70f5217">
+  <img alt="Animated demo" src="https://github.com/user-attachments/assets/501a340a-e6df-4934-90a2-6152b462c14a">
+</picture>
 
 ---
 
-## 理念
+## Philosophy
 
-我们旨在为任何有兴趣尝试这一强大技术组合的人提供进入 Elastic Stack 的最简单途径。这个项目的默认配置是特意保持简约和中立的。它不依赖于任何外部依赖项，并且只使用了尽可能少的自定义自动化来启动和运行。
+We aim at providing the simplest possible entry into the Elastic stack for anybody who feels like experimenting with
+this powerful combo of technologies. This project's default configuration is purposely minimal and unopinionated. It
+does not rely on any external dependency, and uses as little custom automation as necessary to get things up and
+running.
 
-相反，我们相信良好的文档，这样您就可以将此存储库用作模板，进行调整，并使其符合您自己的需求。[sherifabdlnaby/elastdocker][elastdocker] 是基于这一理念的项目之一。
+Instead, we believe in good documentation so that you can use this repository as a template, tweak it, and make it _your
+own_. [sherifabdlnaby/elastdocker][elastdocker] is one example among others of project that builds upon this idea.
 
 ---
 
@@ -87,21 +93,21 @@ docker-compose up
 ### Host setup
 
 * [Docker Engine][docker-install] version **18.06.0** or newer
-* [Docker Compose][compose-install] version **1.28.0** or newer (including [Compose V2][compose-v2])
+* [Docker Compose][compose-install] version **2.0.0** or newer
 * 1.5 GB of RAM
 
 > [!NOTE]
 > Especially on Linux, make sure your user has the [required permissions][linux-postinstall] to interact with the Docker
 > daemon.
 
-默认情况下，堆栈暴露以下端口：:
+By default, the stack exposes the following ports:
 
-* 5044：Logstash Beats 输入
-* 50000：Logstash TCP 输入
-* 9600：Logstash 监控 API
-* 9200：Elasticsearch HTTP
-* 9300：Elasticsearch TCP 传输
-* 5601：Kibana
+* 5044: Logstash Beats input
+* 50000: Logstash TCP input
+* 9600: Logstash monitoring API
+* 9200: Elasticsearch HTTP
+* 9300: Elasticsearch TCP transport
+* 5601: Kibana
 
 > [!WARNING]
 > Elasticsearch's [bootstrap checks][bootstrap-checks] were purposely disabled to facilitate the setup of the Elastic
@@ -123,30 +129,32 @@ instructions from the [documentation][mac-filesharing] to add more locations.
 
 ## Usage
 
-> [!警告]
-> 
-> 每当您切换分支或更新现有堆栈的[版本](#version-selection)时，必须使用 docker-compose build 重新构建堆栈镜像。
+> [!WARNING]
+> You must rebuild the stack images with `docker compose build` whenever you switch branch or update the
+> [version](#version-selection) of an already existing stack.
 
-### 启动堆栈
+### Bringing up the stack
 
-将此存储库克隆到将运行堆栈的 Docker 主机上，使用以下命令：
+Clone this repository onto the Docker host that will run the stack with the command below:
+
 ```sh
 git clone https://github.com/deviantony/docker-elk.git
 ```
 
-然后，通过执行以下命令初始化 docker-elk 所需的 Elasticsearch 用户和组：
+Then, initialize the Elasticsearch users and groups required by docker-elk by executing the command:
+
 ```sh
-docker-compose up setup
+docker compose up setup
 ```
 
-如果一切顺利且设置完成没有错误，启动其他堆栈组件：
+If everything went well and the setup completed without error, start the other stack components:
+
 ```sh
-docker-compose up
+docker compose up
 ```
 
 > [!NOTE]
-> 
-> 您还可以通过在上述命令后附加 -d 标志来在后台（分离模式）运行所有服务。
+> You can also run all services in the background (detached mode) by appending the `-d` flag to the above command.
 
 Give Kibana about a minute to initialize, then access the Kibana web UI by opening <http://localhost:5601> in a web
 browser and use the following (default) credentials to log in:
@@ -155,21 +163,21 @@ browser and use the following (default) credentials to log in:
 * password: *changeme*
 
 > [!NOTE]
-> Upon the initial startup, the `elastic`, `logstash_internal` and `kibana_system` Elasticsearch users are intialized
+> Upon the initial startup, the `elastic`, `logstash_internal` and `kibana_system` Elasticsearch users are initialized
 > with the values of the passwords defined in the [`.env`](.env) file (_"changeme"_ by default). The first one is the
 > [built-in superuser][builtin-users], the other two are used by Kibana and Logstash respectively to communicate with
 > Elasticsearch. This task is only performed during the _initial_ startup of the stack. To change users' passwords
 > _after_ they have been initialized, please refer to the instructions in the next section.
 
-### 初始设置
+### Initial setup
 
-#### 设置用户身份验证
+#### Setting up user authentication
 
 > [!NOTE]
 > Refer to [Security settings in Elasticsearch][es-security] to disable authentication.
 
 > [!WARNING]
-> Starting with Elastic v8.0.0, it is no longer possible to run Kibana using the bootstraped privileged `elastic` user.
+> Starting with Elastic v8.0.0, it is no longer possible to run Kibana using the bootstrapped privileged `elastic` user.
 
 The _"changeme"_ password set by default for all aforementioned users is **unsecure**. For increased security, we will
 reset the passwords of all aforementioned Elasticsearch users to random secrets.
@@ -180,15 +188,15 @@ reset the passwords of all aforementioned Elasticsearch users to random secrets.
     of them.
 
     ```sh
-    docker-compose exec elasticsearch bin/elasticsearch-reset-password --batch --user elastic
+    docker compose exec elasticsearch bin/elasticsearch-reset-password --batch --user elastic
     ```
 
     ```sh
-    docker-compose exec elasticsearch bin/elasticsearch-reset-password --batch --user logstash_internal
+    docker compose exec elasticsearch bin/elasticsearch-reset-password --batch --user logstash_internal
     ```
 
     ```sh
-    docker-compose exec elasticsearch bin/elasticsearch-reset-password --batch --user kibana_system
+    docker compose exec elasticsearch bin/elasticsearch-reset-password --batch --user kibana_system
     ```
 
     If the need for it arises (e.g. if you want to [collect monitoring information][ls-monitoring] through Beats and
@@ -217,7 +225,7 @@ reset the passwords of all aforementioned Elasticsearch users to random secrets.
 1. Restart Logstash and Kibana to re-connect to Elasticsearch using the new passwords
 
     ```sh
-    docker-compose up -d logstash kibana
+    docker compose up -d logstash kibana
     ```
 
 > [!NOTE]
@@ -254,7 +262,7 @@ Elasticsearch data is persisted inside a volume by default.
 In order to entirely shutdown the stack and remove all persisted data, use the following Docker Compose command:
 
 ```sh
-docker-compose down -v
+docker compose down -v
 ```
 
 ### Version selection
@@ -263,7 +271,7 @@ This repository stays aligned with the latest version of the Elastic stack. The 
 version (8.x).
 
 To use a different version of the core Elastic components, simply change the version number inside the [`.env`](.env)
-file. If you are upgrading an existing stack, remember to rebuild all container images using the `docker-compose build`
+file. If you are upgrading an existing stack, remember to rebuild all container images using the `docker compose build`
 command.
 
 > [!IMPORTANT]
@@ -343,10 +351,6 @@ Changing the license type by switching the value of Elasticsearch's `xpack.licen
 After a trial has been started, the loss of features from `trial` to `basic` _must_ be acknowledged using one of the two
 methods described in the first paragraph.
 
-您可以在试用期到期前取消正在进行的试用，从而恢复到基本许可证。这可以通过 Kibana 的许可证管理面板来实现，或者使用 Elasticsearch 的 start_basic 许可 API。请注意，如果在试用期到期之前没有将许可证切换为基本许可证或升级，这是恢复对 Kibana 访问的唯一方法。
-
-通过将 Elasticsearch 的 xpack.license.self_generated.type 设置的值从 trial 切换为 basic 来更改许可证类型（参见许可证设置）仅在初始设置之前有效。在试用期开始后，必须使用第一段中描述的两种方法之一来确认从试用到基本许可证的功能丧失。
-
 ### How to scale out the Elasticsearch cluster
 
 Follow the instructions from the Wiki: [Scaling out Elasticsearch](https://github.com/deviantony/docker-elk/wiki/Elasticsearch-cluster)
@@ -357,7 +361,7 @@ To run the setup container again and re-initialize all users for which a passwor
 simply "up" the `setup` Compose service again:
 
 ```console
-$ docker-compose up setup
+$ docker compose up setup
  ⠿ Container docker-elk-elasticsearch-1  Running
  ⠿ Container docker-elk-setup-1          Created
 Attaching to docker-elk-setup-1
@@ -391,7 +395,7 @@ To add plugins to any ELK component you have to:
 
 1. Add a `RUN` statement to the corresponding `Dockerfile` (eg. `RUN logstash-plugin install logstash-filter-json`)
 1. Add the associated plugin code configuration to the service configuration (eg. Logstash input/output)
-1. Rebuild the images using the `docker-compose build` command
+1. Rebuild the images using the `docker compose build` command
 
 ### How to enable the provided extensions
 
@@ -400,10 +404,6 @@ are not part of the standard Elastic stack, but can be used to enrich it with ex
 
 The documentation for these extensions is provided inside each individual subdirectory, on a per-extension basis. Some
 of them require manual changes to the default ELK configuration.
-
-在 extensions 目录中提供了一些扩展。这些扩展并不是标准 Elastic 栈的一部分，但可以用来丰富其功能，提供额外的集成。
-
-这些扩展的文档位于每个子目录中，并且是按扩展提供的。其中一些扩展需要手动更改默认的 ELK 配置。
 
 ## JVM tuning
 
@@ -473,7 +473,6 @@ See the following Wiki pages:
 
 [docker-install]: https://docs.docker.com/get-docker/
 [compose-install]: https://docs.docker.com/compose/install/
-[compose-v2]: https://docs.docker.com/compose/compose-v2/
 [linux-postinstall]: https://docs.docker.com/engine/install/linux-postinstall/
 
 [bootstrap-checks]: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
@@ -499,3 +498,11 @@ See the following Wiki pages:
 [ls-docker]: https://www.elastic.co/guide/en/logstash/current/docker-config.html
 
 [upgrade]: https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html
+
+<!-- markdownlint-configure-file
+{
+  "MD033": {
+    "allowed_elements": [ "picture", "source", "img" ]
+  }
+}
+-->
