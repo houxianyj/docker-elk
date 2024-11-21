@@ -71,6 +71,10 @@ services:
       - 50000:50000/tcp
       - 50000:50000/udp
       - 9600:9600
+      - "12201:12201/udp"  # 宿主机的 12201 端口映射到容器的 12201
+    expose:
+      #如果 logstash 和其他容器（如 Nginx 容器）都在同一个网络中（如 docker-elk 的网络），可以只使用 expose 来声明 12201 端口。
+      - "12201/udp" # 在同一网络中暴露 UDP 端口
     environment:
       LS_JAVA_OPTS: -Xms256m -Xmx256m
       LOGSTASH_INTERNAL_PASSWORD: ${LOGSTASH_INTERNAL_PASSWORD:-}
