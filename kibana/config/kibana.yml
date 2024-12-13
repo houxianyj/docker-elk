@@ -5,8 +5,6 @@
 server.name: kibana
 server.host: 0.0.0.0
 elasticsearch.hosts: [ https://elasticsearch:9200 ]
-#中文界面 zh-CN    英文猜测是 en
-i18n.locale: "zh-CN"
 
 monitoring.ui.container.elasticsearch.enabled: true
 monitoring.ui.container.logstash.enabled: true
@@ -56,7 +54,7 @@ xpack.fleet.outputs:
     name: default
     type: elasticsearch
     hosts: [ https://elasticsearch:9200 ]
-    # Set to output of 'docker-compose up tls'. Example:
+    # Set to output of 'docker compose up tls'. Example:
     #ca_trusted_fingerprint: 846637d1bb82209640d31b79869a370c8e47c2dc15c7eafd4f3d615e51e3d503
     is_default: true
     is_default_monitoring: true

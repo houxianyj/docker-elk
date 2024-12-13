@@ -19,7 +19,7 @@ The Fleet Server exposes the TCP port `8220` for Agent to Server communications.
 
 ### CA Certificate Fingerprint
 
-Before starting Fleet Server, take note of the CA certificate's SHA256 fingerprint printed by the `docker-compose up
+Before starting Fleet Server, take note of the CA certificate's SHA256 fingerprint printed by the `docker compose up
 tls` command (it is safe to run it multiple times), and use it as the value of the commented `ca_trusted_fingerprint`
 setting inside the [`kibana/config/kibana.yml`][config-kbn] file.
 
@@ -32,7 +32,7 @@ The fingerprint appears on a line similar to the one below, in the output of the
 This fingerprint is required for Fleet Server (and other Elastic Agents) to be able to verify the authenticity of the CA
 certificate presented by Elasticsearch during TLS handshakes.
 
-Restart Kibana with `docker-compose restart kibana` if it is already running.
+Restart Kibana with `docker compose restart kibana` if it is already running.
 
 ### Startup
 
@@ -40,7 +40,7 @@ To include Fleet Server in the stack, run Docker Compose from the root of the re
 argument referencing the `fleet-compose.yml` file:
 
 ```console
-$ docker-compose -f docker-compose.yml -f extensions/fleet/fleet-compose.yml up
+$ docker compose -f docker-compose.yml -f extensions/fleet/fleet-compose.yml up
 ```
 
 ## Configuring Fleet Server

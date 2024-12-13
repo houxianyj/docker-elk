@@ -1,5 +1,3 @@
-version: '3.7'
-
 services:
 
   # The 'tls' service runs a one-off script which initializes TLS certificates and
