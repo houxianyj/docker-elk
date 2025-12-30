@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Check links
         uses: UmbrellaDocs/action-linkspector@v1
@@ -23,7 +23,7 @@ jobs:
           filter_mode: nofilter
 
       - name: Lint
-        uses: DavidAnson/markdownlint-cli2-action@v19
+        uses: DavidAnson/markdownlint-cli2-action@v22
         with:
           config: .github/workflows/lint/rules.markdownlint.yml
           globs: |

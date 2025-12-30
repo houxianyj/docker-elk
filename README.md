@@ -1,8 +1,7 @@
 # Elastic stack (ELK) on Docker
 
-[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-9.0.3-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
+[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-9.2.3-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
 [![Build Status](https://github.com/deviantony/docker-elk/actions/workflows/ci.yml/badge.svg?branch=tls)](https://github.com/deviantony/docker-elk/actions/workflows/ci.yml?query=branch%3Atls)
-[![Join the chat](https://badges.gitter.im/Join%20Chat.svg)](https://app.gitter.im/#/room/#deviantony_docker-elk:gitter.im)
 
 Run the latest version of the [Elastic stack][elk-stack] with Docker and Docker Compose.
 
@@ -50,13 +49,12 @@ docker compose up
 
 ## Philosophy
 
-We aim at providing the simplest possible entry into the Elastic stack for anybody who feels like experimenting with
-this powerful combo of technologies. This project's default configuration is purposely minimal and unopinionated. It
-does not rely on any external dependency, and uses as little custom automation as necessary to get things up and
-running.
+The main goal of docker-elk is to make the Elastic stack as easy as possible to get into. It is **not a blueprint for a
+production-ready deployment**, but rather a _template_ that promotes tweaking and exploration.
 
-Instead, we believe in good documentation so that you can use this repository as a template, tweak it, and make it _your
-own_. [sherifabdlnaby/elastdocker][elastdocker] is one example among others of project that builds upon this idea.
+The authors believe in good documentation over elaborate automation. The project's default configuration is purposely
+minimal and unopinionated. The initial setup does not rely on any external dependency, and uses as little scripting as
+necessary to get things up and running.
 
 ---
 
@@ -122,14 +120,14 @@ By default, the stack exposes the following ports:
 
 #### Windows
 
-If you are using the legacy Hyper-V mode of _Docker Desktop for Windows_, ensure [File Sharing][win-filesharing] is
-enabled for the `C:` drive.
+If you are using the legacy Hyper-V mode of _Docker Desktop for Windows_, ensure that [File
+Sharing][desktop-filesharing] is enabled for the `C:` drive.
 
 #### macOS
 
 The default configuration of _Docker Desktop for Mac_ allows mounting files from `/Users/`, `/Volume/`, `/private/`,
 `/tmp` and `/var/folders` exclusively. Make sure the repository is cloned in one of those locations or follow the
-instructions from the [documentation][mac-filesharing] to add more locations.
+instructions from the [documentation][desktop-filesharing] to add more locations.
 
 ## Usage
 
@@ -162,6 +160,13 @@ executing the command:
 
 ```sh
 docker compose up setup
+```
+
+Optionally (but highly recommended), generate encryption keys for Kibana using the following command and copy its output
+to the Kibana configuration file (`kibana/config/kibana.yml`):
+
+```sh
+docker compose up kibana-genkeys
 ```
 
 If everything went well and the setup completed without error, start the other stack components:
@@ -279,7 +284,7 @@ Elasticsearch data is persisted inside a volume by default.
 In order to entirely shutdown the stack and remove all persisted data, use the following Docker Compose command:
 
 ```sh
-docker compose down -v
+docker compose --profile=setup down -v
 ```
 
 ### Version selection
@@ -298,7 +303,7 @@ command.
 Older major versions are also supported on separate branches:
 
 * [`release-8.x`](https://github.com/deviantony/docker-elk/tree/release-8.x): 8.x series
-* [`release-7.x`](https://github.com/deviantony/docker-elk/tree/release-7.x): 7.x series
+* [`release-7.x`](https://github.com/deviantony/docker-elk/tree/release-7.x): 7.x series (End-of-Life)
 * [`release-6.x`](https://github.com/deviantony/docker-elk/tree/release-6.x): 6.x series (End-of-life)
 * [`release-5.x`](https://github.com/deviantony/docker-elk/tree/release-5.x): 5.x series (End-of-life)
 
@@ -509,44 +514,37 @@ See the following Wiki pages:
 * [External applications](https://github.com/deviantony/docker-elk/wiki/External-applications)
 * [Popular integrations](https://github.com/deviantony/docker-elk/wiki/Popular-integrations)
 
-[elk-stack]: https://www.elastic.co/what-is/elk-stack
+[elk-stack]: https://www.elastic.co/elastic-stack/
 [elastic-docker]: https://www.docker.elastic.co/
 [subscriptions]: https://www.elastic.co/subscriptions
-[es-security]: https://www.elastic.co/guide/en/elasticsearch/reference/current/security-settings.html
-[license-settings]: https://www.elastic.co/guide/en/elasticsearch/reference/current/license-settings.html
-[license-mngmt]: https://www.elastic.co/guide/en/kibana/current/managing-licenses.html
-[license-apis]: https://www.elastic.co/guide/en/elasticsearch/reference/current/licensing-apis.html
+[es-security]: https://www.elastic.co/docs/reference/elasticsearch/configuration-reference/security-settings
+[license-settings]: https://www.elastic.co/docs/reference/elasticsearch/configuration-reference/license-settings
+[license-mngmt]: https://www.elastic.co/docs/deploy-manage/license/manage-your-license-in-self-managed-cluster
+[license-apis]: https://www.elastic.co/docs/api/doc/elasticsearch/group/endpoint-license
 
-[elastdocker]: https://github.com/sherifabdlnaby/elastdocker
-
-[docker-install]: https://docs.docker.com/get-docker/
+[docker-install]: https://docs.docker.com/get-started/get-docker/
 [compose-install]: https://docs.docker.com/compose/install/
 [linux-postinstall]: https://docs.docker.com/engine/install/linux-postinstall/
+[desktop-filesharing]: https://docs.docker.com/desktop/settings-and-maintenance/settings/#file-sharing
 
-[bootstrap-checks]: https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
-[es-sys-config]: https://www.elastic.co/guide/en/elasticsearch/reference/current/system-config.html
-[es-heap]: https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html#heap-size-settings
+[bootstrap-checks]: https://www.elastic.co/docs/deploy-manage/deploy/self-managed/bootstrap-checks
+[es-sys-config]: https://www.elastic.co/docs/deploy-manage/deploy/self-managed/important-system-configuration
+[es-heap]: https://www.elastic.co/docs/deploy-manage/deploy/self-managed/important-settings-configuration#heap-size-settings
 
-[win-filesharing]: https://docs.docker.com/desktop/settings/windows/#file-sharing
-[mac-filesharing]: https://docs.docker.com/desktop/settings/mac/#file-sharing
-
-[builtin-users]: https://www.elastic.co/guide/en/elasticsearch/reference/current/built-in-users.html
-[es-tls]: https://www.elastic.co/guide/en/elasticsearch/reference/current/manually-configure-security.html
-[ls-monitoring]: https://www.elastic.co/guide/en/logstash/current/monitoring-with-metricbeat.html
-[sec-cluster]: https://www.elastic.co/guide/en/elasticsearch/reference/current/secure-cluster.html
-
-[connect-kibana]: https://www.elastic.co/guide/en/kibana/current/connect-to-elasticsearch.html
-[index-pattern]: https://www.elastic.co/guide/en/kibana/current/index-patterns.html
+[builtin-users]: https://www.elastic.co/docs/deploy-manage/users-roles/cluster-or-deployment-auth/built-in-users
+[es-tls]: https://www.elastic.co/docs/deploy-manage/security/self-setup
+[ls-monitoring]: https://www.elastic.co/docs/reference/logstash/monitoring-with-metricbeat
+[sec-cluster]: https://www.elastic.co/docs/deploy-manage/security#cluster-or-deployment-security-features
 
 [config-es]: ./elasticsearch/config/elasticsearch.yml
 [config-kbn]: ./kibana/config/kibana.yml
 [config-ls]: ./logstash/config/logstash.yml
 
-[es-docker]: https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
-[kbn-docker]: https://www.elastic.co/guide/en/kibana/current/docker.html
-[ls-docker]: https://www.elastic.co/guide/en/logstash/current/docker-config.html
+[es-docker]: https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-elasticsearch-with-docker
+[kbn-docker]: https://www.elastic.co/docs/deploy-manage/deploy/self-managed/install-kibana-with-docker
+[ls-docker]: https://www.elastic.co/docs/reference/logstash/docker-config
 
-[upgrade]: https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-upgrade.html
+[upgrade]: https://www.elastic.co/docs/deploy-manage/upgrade/deployment-or-cluster/self-managed
 
 <!-- markdownlint-configure-file
 {

@@ -18,43 +18,7 @@ jobs:
       COMPOSE_PROJECT_NAME: docker-elk
 
     steps:
-      - uses: actions/checkout@v4
-
-      #####################################################
-      #                                                   #
-      # Install all dependencies required by test suites. #
-      #                                                   #
-      #####################################################
-
-      - name: Pre-build container images
-        run: >-
-          docker compose
-          --profile=setup
-          -f docker-compose.yml
-          -f extensions/fleet/fleet-compose.yml
-          -f extensions/fleet/agent-apmserver-compose.yml
-          -f extensions/metricbeat/metricbeat-compose.yml
-          -f extensions/filebeat/filebeat-compose.yml
-          -f extensions/heartbeat/heartbeat-compose.yml
-          build
-
-
-      - name: Generate X.509 assets for TLS communications
-        run: |
-          echo '::group::Generate certificates and private keys'
-          docker compose up tls
-          echo '::endgroup::'
-
-          echo '::group::Provide CA fingerprint for Fleet output'
-          declare ca_fingerprint
-          ca_fingerprint="$(openssl x509 -fingerprint -sha256 -noout -in tls/certs/ca/ca.crt \
-              | cut -d '=' -f2 \
-              | tr -d ':' \
-              | tr '[:upper:]' '[:lower:]'
-          )"
-          sed -i "s/#\(ca_trusted_fingerprint:\).*/\1 ${ca_fingerprint}/g" kibana/config/kibana.yml
-          git diff
-          echo '::endgroup::'
+      - uses: actions/checkout@v6
 
       ########################################################
       #                                                      #
@@ -75,22 +39,52 @@ jobs:
           -e 's/\(BEATS_SYSTEM_PASSWORD=\)'\'\''/\1testpasswd/g'
           .env
 
+      - name: Generate X.509 assets for TLS communications
+        run: |
+          echo '::group::Generate certificates and private keys'
+          docker compose up tls
+          echo '::endgroup::'
+
+          echo '::group::Provide CA fingerprint for Fleet output'
+          declare ca_fingerprint
+          ca_fingerprint="$(openssl x509 -fingerprint -sha256 -noout -in tls/certs/ca/ca.crt \
+              | cut -d '=' -f2 \
+              | tr -d ':' \
+              | tr '[:upper:]' '[:lower:]'
+          )"
+          sed -i "s/#\(ca_trusted_fingerprint:\).*/\1 ${ca_fingerprint}/g" kibana/config/kibana.yml
+          git diff
+          echo '::endgroup::'
+
+      # Elasticsearch's high disk watermark gets regularly exceeded on GitHub Actions runners.
+      # https://www.elastic.co/guide/en/elasticsearch/reference/current/fix-watermark-errors.html
+      - name: Disable Elasticsearch disk allocation decider
+        run: |
+          docker compose up -d elasticsearch
+          .github/workflows/scripts/disable-disk-alloc-decider.sh
+
+      - name: Pre-build container images
+        run: >-
+          docker compose
+          -f docker-compose.yml
+          -f extensions/fleet/fleet-compose.yml
+          -f extensions/fleet/agent-apmserver-compose.yml
+          -f extensions/metricbeat/metricbeat-compose.yml
+          -f extensions/filebeat/filebeat-compose.yml
+          -f extensions/heartbeat/heartbeat-compose.yml
+          build
+
       - name: Generate Kibana encryption keys
         run: docker container run --rm docker-elk-kibana bin/kibana-encryption-keys generate -q >>kibana/config/kibana.yml
 
       - name:  Set up users and roles
-        run: docker compose up setup
+        run: docker compose up --exit-code-from=setup setup
 
       #############################
       #                           #
       # Test core and extensions. #
       #                           #
       #############################
-
-      # Elasticsearch's high disk watermark gets regularly exceeded on GitHub Actions runners.
-      # https://www.elastic.co/guide/en/elasticsearch/reference/current/fix-watermark-errors.html
-      - name: Disable Elasticsearch disk allocation decider
-        run: .github/workflows/scripts/disable-disk-alloc-decider.sh
 
       #
       # Core components: Elasticsearch, Logstash, Kibana
@@ -167,7 +161,7 @@ jobs:
 
       - name: Upload collected troubleshooting data
         if: always() && steps.debug-data.outputs.path
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: debug-data
           path: ${{ steps.debug-data.outputs.path }}/*.*

@@ -22,17 +22,23 @@ function suberr {
 	echo "   ⠍ $1" >&2
 }
 
+# Inject common arguments to curl commands based on the environment.
+function augment_curl_args {
+	local args_var_name=$1
+	local -n args_ref="${args_var_name}"
+	if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
+		args_ref+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
+	fi
+	if [[ -n "${ELASTICSEARCH_ADDR:-}" ]]; then
+		args_ref+=( '--resolve' "elasticsearch:9200:${ELASTICSEARCH_ADDR}" )
+	fi
+}
+
 # Poll the 'elasticsearch' service until it responds with HTTP code 200.
 function wait_for_elasticsearch {
-	local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
+	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}' 'https://elasticsearch:9200/' '--cacert' "$es_ca_cert" )
 
-	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}' 'https://elasticsearch:9200/'
-		'--resolve' "elasticsearch:9200:${elasticsearch_host}" '--cacert' "$es_ca_cert"
-		)
-
-	if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-		args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
-	fi
+	augment_curl_args args
 
 	local -i result=1
 	local output
@@ -63,15 +69,9 @@ function wait_for_elasticsearch {
 
 # Poll the Elasticsearch users API until it returns users.
 function wait_for_builtin_users {
-	local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
+	local -a args=( '-s' '-D-' '-m15' 'https://elasticsearch:9200/_security/user?pretty' '--cacert' "$es_ca_cert" )
 
-	local -a args=( '-s' '-D-' '-m15' 'https://elasticsearch:9200/_security/user?pretty'
-		'--resolve' "elasticsearch:9200:${elasticsearch_host}" '--cacert' "$es_ca_cert"
-		)
-
-	if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-		args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
-	fi
+	augment_curl_args args
 
 	local -i result=1
 
@@ -114,16 +114,12 @@ function wait_for_builtin_users {
 function check_user_exists {
 	local username=$1
 
-	local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
-
 	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
 		"https://elasticsearch:9200/_security/user/${username}"
-		'--resolve' "elasticsearch:9200:${elasticsearch_host}" '--cacert' "$es_ca_cert"
+		'--cacert' "$es_ca_cert"
 		)
 
-	if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-		args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
-	fi
+	augment_curl_args args
 
 	local -i result=1
 	local -i exists=0
@@ -151,19 +147,15 @@ function set_user_password {
 	local username=$1
 	local password=$2
 
-	local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
-
 	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
 		"https://elasticsearch:9200/_security/user/${username}/_password"
-		'--resolve' "elasticsearch:9200:${elasticsearch_host}" '--cacert' "$es_ca_cert"
+		'--cacert' "$es_ca_cert"
 		'-X' 'POST'
 		'-H' 'Content-Type: application/json'
 		'-d' "{\"password\" : \"${password}\"}"
 		)
 
-	if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-		args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
-	fi
+	augment_curl_args args
 
 	local -i result=1
 	local output
@@ -186,19 +178,15 @@ function create_user {
 	local password=$2
 	local role=$3
 
-	local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
-
 	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
 		"https://elasticsearch:9200/_security/user/${username}"
-		'--resolve' "elasticsearch:9200:${elasticsearch_host}" '--cacert' "$es_ca_cert"
+		'--cacert' "$es_ca_cert"
 		'-X' 'POST'
 		'-H' 'Content-Type: application/json'
 		'-d' "{\"password\":\"${password}\",\"roles\":[\"${role}\"]}"
 		)
 
-	if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-		args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
-	fi
+	augment_curl_args args
 
 	local -i result=1
 	local output
@@ -220,19 +208,15 @@ function ensure_role {
 	local name=$1
 	local body=$2
 
-	local elasticsearch_host="${ELASTICSEARCH_HOST:-elasticsearch}"
-
 	local -a args=( '-s' '-D-' '-m15' '-w' '%{http_code}'
 		"https://elasticsearch:9200/_security/role/${name}"
-		'--resolve' "elasticsearch:9200:${elasticsearch_host}" '--cacert' "$es_ca_cert"
+		'--cacert' "$es_ca_cert"
 		'-X' 'POST'
 		'-H' 'Content-Type: application/json'
 		'-d' "$body"
 		)
 
-	if [[ -n "${ELASTIC_PASSWORD:-}" ]]; then
-		args+=( '-u' "elastic:${ELASTIC_PASSWORD}" )
-	fi
+	augment_curl_args args
 
 	local -i result=1
 	local output
