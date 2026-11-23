@@ -1,6 +1,6 @@
 # Elastic stack (ELK) on Docker
 
-[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-9.4.2-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
+[![Elastic Stack version](https://img.shields.io/badge/Elastic%20Stack-9.5.6-00bfb3?style=flat&logo=elastic-stack)](https://www.elastic.co/blog/category/releases)
 [![Build Status](https://github.com/deviantony/docker-elk/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/deviantony/docker-elk/actions/workflows/ci.yml?query=branch%3Amain)
 
 Run the latest version of the [Elastic stack][elk-stack] with Docker and Docker Compose.
@@ -184,7 +184,7 @@ browser and use the following (default) credentials to log in:
 > [!WARNING]
 > Starting with Elastic v8.0.0, it is no longer possible to run Kibana using the bootstrapped privileged `elastic` user.
 
-The _"changeme"_ password set by default for all aforementioned users is **unsecure**. For increased security, we will
+The _"changeme"_ password set by default for all aforementioned users is **unsafe**. For increased security, we will
 reset the passwords of all aforementioned Elasticsearch users to random secrets.
 
 1. Reset passwords for default users
